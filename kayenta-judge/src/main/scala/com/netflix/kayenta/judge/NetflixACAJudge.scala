@@ -166,13 +166,11 @@ class NetflixACAJudge extends CanaryJudge with StrictLogging {
     val experiment = Metric(metric.getName, experimentValues, label="Canary")
     val control = Metric(metric.getName, controlValues, label="Baseline")
 
-    val directionalityOption = MapUtils.get(metricConfig.getAnalysisConfigurations, "canary", "direction")
-    val directionalityString = if (directionalityOption.isDefined) directionalityOption.get.toString else "default"
+    val directionalityString = MapUtils.getAsStringWithDefault("either", metricConfig.getAnalysisConfigurations, "canary", "direction")
     val directionality = MetricDirection.parse(directionalityString)
 
-    logger.debug("Metric " + metric.getName + " Directionality " + directionality + " string=" + directionalityOption)
-    logger.debug("Metric " + metric.getName + " Experiment data point count: " + experimentValues.length)
-    logger.debug("Metric " + metric.getName + " Control data point count: " + controlValues.length)
+    val nanStrategyString = MapUtils.getAsStringWithDefault("none", metricConfig.getAnalysisConfigurations, "canary", "nanStrategy")
+    val nanStrategy = NanStrategy.parse(nanStrategyString)
 
     //=============================================
     // Metric Validation
